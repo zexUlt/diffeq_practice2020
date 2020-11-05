@@ -10,6 +10,7 @@
 typedef struct {
     double* Y1;
     double* Y2;
+    double* T;
     int n;
 }SMainData;
 
