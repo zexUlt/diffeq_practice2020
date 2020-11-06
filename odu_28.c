@@ -31,36 +31,16 @@ void solver_main()
     data.Y2[0] = tr;
     data.T[0] = t1;
 
-    for(int i = 0; i < 4; i++){
-        k1 = f1(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-        l1 = f2(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-        k2 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-        l2 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-        k3 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-        l3 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-        k4 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
-        l4 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
+    data.Y1_[0] = sInit.y_a;
+    data.Y2_[0] = tr;
+    data.T_[0] = t1;
 
-        data.Y1[i + 1] = data.Y1[i] + (k1 + 2*k2 + 2*k3 + k4)/6;
-        data.Y2[i + 1] = data.Y2[i] + (l1 + 2*l2 + 2*l3 + l4)/6;
-        data.T[i + 1] = data.T[i] + sInit.h;
-    }
+    getStartingPoints(data.Y1, data.Y2, data.T);
+    Adams(data.Y1, data.Y2, data.T, n2);
 
-    for(int i = 3; i < n2 - 1; i++){
-        data.Y1[i + 1] = data.Y1[i] + sInit.h*(
-            55*f1(data.T[i], data.Y1[i], data.Y2[i])
-            - 59*f1(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-            + 37*f1(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-            - 9*f1(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
+    getStartingPoints(data.Y1_, data.Y2_, data.T_);
+    Adams(data.Y1_, data.Y2_, data.T_, n1);
 
-        data.Y2[i + 1] = data.Y2[i] + sInit.h*(
-            55*f2(data.T[i], data.Y1[i], data.Y2[i])
-            - 59*f2(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-            + 37*f2(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-            - 9*f2(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
-
-        data.T[i + 1] = data.T[i] + sInit.h;
-    }
     printf("%lf", f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1]));
     tl = tr;
 
@@ -71,16 +51,31 @@ void solver_main()
         free(data.Y1);
         free(data.Y2);
 
+        free(data.T_);
+        free(data.Y1_);
+        free(data.Y2_);
+
         data.Y1 = (double*) calloc(n2, sizeof(double));
         data.Y2 = (double*) calloc(n2, sizeof(double));
         data.T = (double*) calloc(n2, sizeof(double));
+
+        data.Y1_ = (double*) calloc(n1, sizeof(double));
+        data.Y2_ = (double*) calloc(n1, sizeof(double));
+        data.T_ = (double*) calloc(n1, sizeof(double));
 
         data.Y1[0] = sInit.y_a;
         data.Y2[0] = tl;
         data.T[0] = tl;
 
+        data.Y1_[0] = sInit.y_a;
+        data.Y2_[0] = tr;
+        data.T_[0] = t1;
+
         getStartingPoints(data.Y1, data.Y2, data.T);
         Adams(data.Y1, data.Y2, data.T, n1);
+
+        getStartingPoints(data.Y1_, data.Y2_, data.T_);
+        Adams(data.Y1_, data.Y2_, data.T_, n1);
 
     }while (f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1]) < 0);
 
@@ -101,36 +96,8 @@ void solver_main()
         data.Y2[0] = tl;
         data.T[0] = tl;
 
-        for(int i = 0; i < 4; i++){
-            k1 = f1(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-            l1 = f2(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-            k2 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-            l2 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-            k3 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-            l3 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-            k4 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
-            l4 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
-
-            data.Y1[i + 1] = data.Y1[i] + (k1 + 2*k2 + 2*k3 + k4)/6;
-            data.Y2[i + 1] = data.Y2[i] + (l1 + 2*l2 + 2*l3 + l4)/6;
-            data.T[i + 1] = data.T[i] + sInit.h;
-        }
-
-        for(int i = 3; i < n2 - 1; i++){
-            data.Y1[i + 1] = data.Y1[i] + sInit.h*(
-                    55*f1(data.T[i], data.Y1[i], data.Y2[i])
-                    - 59*f1(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-                    + 37*f1(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-                    - 9*f1(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
-
-            data.Y2[i + 1] = data.Y2[i] + sInit.h*(
-                    55*f2(data.T[i], data.Y1[i], data.Y2[i])
-                    - 59*f2(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-                    + 37*f2(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-                    - 9*f2(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
-
-            data.T[i + 1] = data.T[i] + sInit.h;
-        }
+        getStartingPoints(data.Y1, data.Y2, data.T);
+        Adams(data.Y1, data.Y2, data.T, n2);
 
         if(fabs(f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1])) <= sInit.eps){
             break;
