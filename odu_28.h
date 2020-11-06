@@ -11,6 +11,9 @@ typedef struct {
     double* Y1;
     double* Y2;
     double* T;
+    double* Y1_;
+    double* Y2_;
+    double* T_;
     int n;
 }SMainData;
 
@@ -29,7 +32,6 @@ static SMainData data;
 
 
 void Solver_main();
-void getStartingPoints(double* storageArray);
-double* expandArray(double* arrayToExpand);
-void allocateMemory();
+void getStartingPoints(double* Y1, double* Y2, double* T);
+void Adams(double* Y1, double* Y2, double* T, int n);
 #endif // PRAKT_2020_ODU_28_H
