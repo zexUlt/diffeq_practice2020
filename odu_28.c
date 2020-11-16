@@ -8,40 +8,32 @@
 #include <math.h>
 #include <stdio.h>
 
-void solver_main()
+
+void Solver_main()
+{
+
+}
+
+
+void ShootingMethod(int n)
 {
     double tr = 0; // Right point for shooting
     double tl;
     double t1 = sInit.a;
-    double k1, k2, k3, k4, l1, l2, l3, l4;
+    double loss;
 
-    int n1 = (int) ((sInit.b - sInit.a)/sInit.h);
-    int n2 = n1*2;
-
-    data.Y1 = (double*) calloc(n2, sizeof(double));
-    data.Y2 = (double*) calloc(n2, sizeof(double));
-    data.T = (double*) calloc(n2, sizeof(double));
-
-    data.Y1_ = (double*) calloc(n1, sizeof(double));
-    data.Y2_ = (double*) calloc(n1, sizeof(double));
-    data.T_ = (double*) calloc(n1, sizeof(double));
-
+    data.Y1 = (double*) calloc(n, sizeof(double));
+    data.Y2 = (double*) calloc(n, sizeof(double));
+    data.T = (double*) calloc(n, sizeof(double));
 
     data.Y1[0] = sInit.y_a;
     data.Y2[0] = tr;
     data.T[0] = t1;
 
-    data.Y1_[0] = sInit.y_a;
-    data.Y2_[0] = tr;
-    data.T_[0] = t1;
+    GetStartingPoints(data.Y1, data.Y2, data.T);
+    Adams(data.Y1, data.Y2, data.T, n);
 
-    getStartingPoints(data.Y1, data.Y2, data.T);
-    Adams(data.Y1, data.Y2, data.T, n2);
-
-    getStartingPoints(data.Y1_, data.Y2_, data.T_);
-    Adams(data.Y1_, data.Y2_, data.T_, n1);
-
-    printf("%lf", f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1]));
+    printf("%lf", f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]));
     tl = tr;
 
     do{
@@ -51,33 +43,18 @@ void solver_main()
         free(data.Y1);
         free(data.Y2);
 
-        free(data.T_);
-        free(data.Y1_);
-        free(data.Y2_);
-
-        data.Y1 = (double*) calloc(n2, sizeof(double));
-        data.Y2 = (double*) calloc(n2, sizeof(double));
-        data.T = (double*) calloc(n2, sizeof(double));
-
-        data.Y1_ = (double*) calloc(n1, sizeof(double));
-        data.Y2_ = (double*) calloc(n1, sizeof(double));
-        data.T_ = (double*) calloc(n1, sizeof(double));
+        data.Y1 = (double*) calloc(n, sizeof(double));
+        data.Y2 = (double*) calloc(n, sizeof(double));
+        data.T = (double*) calloc(n, sizeof(double));
 
         data.Y1[0] = sInit.y_a;
         data.Y2[0] = tl;
         data.T[0] = tl;
 
-        data.Y1_[0] = sInit.y_a;
-        data.Y2_[0] = tr;
-        data.T_[0] = t1;
+        GetStartingPoints(data.Y1, data.Y2, data.T);
+        Adams(data.Y1, data.Y2, data.T, n);
 
-        getStartingPoints(data.Y1, data.Y2, data.T);
-        Adams(data.Y1, data.Y2, data.T, n1);
-
-        getStartingPoints(data.Y1_, data.Y2_, data.T_);
-        Adams(data.Y1_, data.Y2_, data.T_, n1);
-
-    }while (f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1]) < 0);
+    }while (f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]) < 0);
 
     double m;
 
@@ -88,28 +65,30 @@ void solver_main()
         free(data.Y1);
         free(data.Y2);
 
-        data.Y1 = (double*) calloc(n2, sizeof(double));
-        data.Y2 = (double*) calloc(n2, sizeof(double));
-        data.T = (double*) calloc(n2, sizeof(double));
+        data.Y1 = (double*) calloc(n, sizeof(double));
+        data.Y2 = (double*) calloc(n, sizeof(double));
+        data.T = (double*) calloc(n, sizeof(double));
 
         data.Y1[0] = sInit.y_a;
         data.Y2[0] = tl;
         data.T[0] = tl;
 
-        getStartingPoints(data.Y1, data.Y2, data.T);
-        Adams(data.Y1, data.Y2, data.T, n2);
+        GetStartingPoints(data.Y1, data.Y2, data.T);
+        Adams(data.Y1, data.Y2, data.T, n);
 
-        if(fabs(f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1])) <= sInit.eps){
+        if(fabs(f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1])) <= sInit.eps){
             break;
-        }else if(f2(data.T[n2 - 1], data.Y1[n2 - 1], data.Y2[n2 - 1]) > 0){
+        }else if(f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]) > 0){
             tr = m;
         }else{
             tl = m;
         }
     }
+
+//    return loss;
 }
 
-void getStartingPoints(double* Y1, double* Y2, double* T)
+void GetStartingPoints(double* Y1, double* Y2, double* T)
 {
     double k1, k2, k3, k4, l1, l2, l3, l4;
 
@@ -145,5 +124,16 @@ void Adams(double* Y1, double* Y2, double* T, int n)
                 - 9*f2(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
 
         data.T[i + 1] = data.T[i] + sInit.h;
+    }
+}
+
+double sum(double *array, int _size)
+{
+    if(_size <= 0){
+        return 0;
+    }else if(_size == 1){
+        return array[0];
+    }else{
+        return sum(array, _size/2) + sum(array + _size/2, _size - _size/2);
     }
 }

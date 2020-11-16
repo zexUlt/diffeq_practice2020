@@ -30,8 +30,13 @@ SInitialData sInit;
 static SMainData data;
 
 
-
+// Main solver functions
 void Solver_main();
-void getStartingPoints(double* Y1, double* Y2, double* T);
+void ShootingMethod(int n);
+void GetStartingPoints(double* Y1, double* Y2, double* T);
 void Adams(double* Y1, double* Y2, double* T, int n);
+
+// Helper functions
+double sum(double* array, int _size);
+
 #endif // PRAKT_2020_ODU_28_H
