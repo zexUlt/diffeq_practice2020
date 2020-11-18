@@ -11,7 +11,10 @@
 
 void Solver_main()
 {
+    while(1){
 
+        if()
+    }
 }
 
 
@@ -135,5 +138,13 @@ double sum(double *array, int _size)
         return array[0];
     }else{
         return sum(array, _size/2) + sum(array + _size/2, _size - _size/2);
+    }
+}
+
+double metric(double* y1, double* y2, int n)
+{
+    for(int i = 0; i < n; i++){
+        y1[i] -= y2[i];
+        y1[i] *= y1[i];
     }
 }

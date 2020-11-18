@@ -35,6 +35,7 @@ void Solver_main();
 void ShootingMethod(int n);
 void GetStartingPoints(double* Y1, double* Y2, double* T);
 void Adams(double* Y1, double* Y2, double* T, int n);
+double metric(double* y1, double* y2, int n);
 
 // Helper functions
 double sum(double* array, int _size);
