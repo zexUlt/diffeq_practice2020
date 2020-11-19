@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 #include <math.h>
-#include <Python.h>
 
 
 typedef enum {
@@ -26,8 +25,8 @@ int main(int argv, char* argc[]) {
         }
     }
 
-//    SMainData answer = Solver_main();
-    draw(NULL, 1, 1, 1, 1);
+    SMainData answer = Solver_main();
+    draw(answer.Y1, sInit.a, sInit.b, sInit.h, (sInit.b - sInit.a) / sInit.h);
 //    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
 //        printf("%lf ", answer.Y1[i]);
 //    }
@@ -57,26 +56,26 @@ ErrNo parseInput(char* _fName)
 
 void draw(double* y, double a, double b, double h, int n)
 {
-    PyObject* pName = PyUnicode_FromString("PlotDraw");
-    PyObject* pModule = PyImport_Import(pName);
+    double left = a;
+    double right = b;
+    FILE* pipe = _popen("gnuplot -persistent", "w");
 
-    if(pModule)
-    {
-        PyObject* pFunc = PyObject_GetAttrString(pModule, "Draw");
-        if(pFunc && PyCallable_Check(pFunc))
-        {
-            PyObject* pValue = PyObject_CallObject(pFunc, NULL);
+    fprintf(pipe, "plot '-' with linespoints pointtype 0 lw 6 lt rgb \"#ff0084\" title \"True function\"");
+    fprintf(pipe, " , '-' with linespoints pointtype 0 lw 2 lt rgb \"#00ff55\" title \"Approximation\"\n");
 
-            printf_s("C: getInteger() = %ld\n", PyLong_AsLong(pValue));
-        }
-        else
-        {
-            printf("ERROR: function getInteger()\n");
-        }
-
+    for(;left < right; left += h){
+        fprintf(pipe, "%lf %lf\n", left, 3*left + exp(-2*left));
     }
-    else
-    {
-        printf_s("ERROR: Module not imported\n");
+
+    fprintf(pipe, "%s\n", "e");
+    fflush(pipe);
+
+    left = a;
+    for(int i = 0; i < n; i++, left += h){
+        fprintf(pipe, "%lf %lf\n", left, y[i]);
     }
+
+    fprintf(pipe, "%s\n", "e");
+    fflush(pipe);
+    _pclose(pipe);
 }
