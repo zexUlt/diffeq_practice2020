@@ -18,21 +18,21 @@ int main(int argv, char* argc[]) {
         char* fileName = argc[1];
         switch ((int) parseInput(fileName)) {
             case FILENEXST: printf("Error code 1 (file doesn't exists).\n");
-                break;
+                return 1;
             case READ_ERROR: printf("Error code 2 (file read error or not enough data in file).\n");
-                break;
+                return 2;
             case SUCCESS: printf("Continue processing.\n");
         }
     }
 
-    Solver_main();
+    SMainData answer = Solver_main();
 
     for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
-        printf("%lf ", data.Y1_[i]);
+        printf("%lf ", answer.Y1[i]);
     }
 
     for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
-        printf("%lf ", 3*data.T_[i] + exp(-2*data.T_[i]));
+        printf("%lf ", 3*answer.T[i] + exp(-2*answer.T[i]));
     }
     return 0;
 }
@@ -47,7 +47,7 @@ ErrNo parseInput(char* _fName)
            return READ_ERROR;
        }
 
-       sInit.h = sInit.y_a;
+       sInit.h = .1;
     } else {
       return FILENEXST;
     }

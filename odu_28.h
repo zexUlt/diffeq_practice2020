@@ -11,9 +11,6 @@ typedef struct {
     double* Y1;
     double* Y2;
     double* T;
-    double* Y1_;
-    double* Y2_;
-    double* T_;
 }SMainData;
 
 typedef struct SInitialData{
@@ -25,18 +22,24 @@ typedef struct SInitialData{
     double eps;
 }SInitialData;
 
-SInitialData sInit;
-SMainData data;
-
+extern SInitialData sInit;
+extern double* _Y1__;
+extern double* _Y2__;
+extern double* _T__;
+extern double* Y1_;
+extern double* Y2_;
+extern double* T_;
 
 // Main solver functions
-void Solver_main();
-void ShootingMethod(double*, double*, double*, int n);
-void GetStartingPoints(double* Y1, double* Y2, double* T);
-void Adams(double* Y1, double* Y2, double* T, int n);
-double metric(double* y1, double* y2, int n);
+SMainData Solver_main();
+SMainData ShootingMethod(double*, double*, double*, int n, double h);
+void GetStartingPoints(double* Y1, double* Y2, double* T, double h);
+void Adams(double* Y1, double* Y2, double* T, int n, double h);
+double metric(const double* y1, const double* y2, const int n);
+double g(double t, double y1, double y2);
 
 // Helper functions
 double sum(double* array, int _size);
+void swap(double* a, double* b);
 
 #endif // PRAKT_2020_ODU_28_H
