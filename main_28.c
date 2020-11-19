@@ -30,9 +30,9 @@ int main(int argv, char* argc[]) {
     for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
         printf("%lf ", answer.Y1[i]);
     }
-
-    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
-        printf("%lf ", 3*answer.T[i] + exp(-2*answer.T[i]));
+    printf("\n");
+    for(double i = sInit.a; i < sInit.b; i += sInit.h){
+        printf("%lf ", 3*i + exp(-2*i));
     }
     return 0;
 }

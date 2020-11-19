@@ -31,6 +31,11 @@ SMainData Solver_main()
         result1 = ShootingMethod(_Y1__, _Y2__, _T__, n1 + 1, sInit.h*2);
         result2 = ShootingMethod(Y1_, Y2_, T_, n2 + 1, sInit.h);
         acc = metric(result1.Y1, result2.Y1, n1);
+//        for(int i = 0; i < n1; i++)
+//            printf("%lf ", result1.Y1[i]);
+//        printf("\n");
+//        for(int i = 0; i < n2; i++)
+//            printf("%lf ", result2.Y1[i]);
     }while(acc > sInit.eps);
 
     return result2;
@@ -125,6 +130,7 @@ SMainData ShootingMethod(double* y1, double* y2, double* __T, int n, double h)
         GetStartingPoints(y1, y2, __T, h);
         Adams(y1, y2, __T, n, h);
 
+
 //        printf("%.15lf\n", g(__T[n - 1], y1[n - 1], y2[n - 1]));
 
         if(fabs(g(__T[n - 1], y1[n - 1], y2[n - 1])) <= sInit.eps){
@@ -140,9 +146,12 @@ SMainData ShootingMethod(double* y1, double* y2, double* __T, int n, double h)
     data.Y2 = malloc(n * sizeof(double));
     data.T = malloc(n * sizeof(double));
 
-    memcpy_s(data.Y1, n, y1, n);
-    memcpy_s(data.Y2, n, y2, n);
-    memcpy_s(data.T, n, __T, n);
+    memcpy_s(data.Y1, n*sizeof(double), y1, n*sizeof(double));
+    memcpy_s(data.Y2, n*sizeof(double), y2, n*sizeof(double));
+    memcpy_s(data.T, n*sizeof(double), __T, n*sizeof(double));
+//    for(int i = 0; i < n; i++)
+//        printf("%lf ", data.Y1[i]);
+//    printf("\n");
 
     return data;
 }
@@ -206,8 +215,8 @@ double metric(const double* y1, const double* y2, const int n)
 {
     double* tmp = (double*)malloc(n * sizeof(double));
     for(int i = 0, j = 0; i < n; i++, j += 2){
-        tmp[i] = y1[i] - y2[j];
-        tmp[i] *= tmp[i];
+        tmp[i] = y1[i] - y2[i*2];
+        tmp[i] *= tmp[i]/n;
     }
     return sum(tmp, n);
 }
