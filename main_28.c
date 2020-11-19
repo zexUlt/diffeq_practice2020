@@ -60,8 +60,8 @@ void draw(double* y, double a, double b, double h, int n)
     double right = b;
     FILE* pipe = _popen("gnuplot -persistent", "w");
 
-    fprintf(pipe, "plot '-' with linespoints pointtype 0 lw 6 lt rgb \"#ff0084\" title \"True function\"");
-    fprintf(pipe, " , '-' with linespoints pointtype 0 lw 2 lt rgb \"#00ff55\" title \"Approximation\"\n");
+    fprintf(pipe, "plot '-' with linespoints pointtype 0 lw 6 lt rgb \"#ff0000\" title \"True function\"");
+    fprintf(pipe, " , '-' with linespoints pointtype 0 lw 2 lt rgb \"#00ff00\" title \"Approximation\"\n");
 
     for(;left < right; left += h){
         fprintf(pipe, "%lf %lf\n", left, 3*left + exp(-2*left));
