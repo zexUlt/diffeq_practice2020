@@ -1,8 +1,9 @@
 #include "odu_28.h"
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <math.h>
+#include <Python.h>
+
 
 typedef enum {
     SUCCESS,
@@ -11,7 +12,7 @@ typedef enum {
 }ErrNo;
 
 ErrNo parseInput(char*);
-
+void draw(double*, double, double, double, int);
 
 int main(int argv, char* argc[]) {
     if(argv > 1){
@@ -25,15 +26,15 @@ int main(int argv, char* argc[]) {
         }
     }
 
-    SMainData answer = Solver_main();
-
-    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
-        printf("%lf ", answer.Y1[i]);
-    }
-    printf("\n");
-    for(double i = sInit.a; i < sInit.b; i += sInit.h){
-        printf("%lf ", 3*i + exp(-2*i));
-    }
+//    SMainData answer = Solver_main();
+    draw(NULL, 1, 1, 1, 1);
+//    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
+//        printf("%lf ", answer.Y1[i]);
+//    }
+//    printf("\n");
+//    for(double i = sInit.a; i < sInit.b; i += sInit.h){
+//        printf("%lf ", 3*i + exp(-2*i));
+//    }
     return 0;
 }
 
@@ -52,4 +53,30 @@ ErrNo parseInput(char* _fName)
       return FILENEXST;
     }
     return SUCCESS;
+}
+
+void draw(double* y, double a, double b, double h, int n)
+{
+    PyObject* pName = PyUnicode_FromString("PlotDraw");
+    PyObject* pModule = PyImport_Import(pName);
+
+    if(pModule)
+    {
+        PyObject* pFunc = PyObject_GetAttrString(pModule, "Draw");
+        if(pFunc && PyCallable_Check(pFunc))
+        {
+            PyObject* pValue = PyObject_CallObject(pFunc, NULL);
+
+            printf_s("C: getInteger() = %ld\n", PyLong_AsLong(pValue));
+        }
+        else
+        {
+            printf("ERROR: function getInteger()\n");
+        }
+
+    }
+    else
+    {
+        printf_s("ERROR: Module not imported\n");
+    }
 }
