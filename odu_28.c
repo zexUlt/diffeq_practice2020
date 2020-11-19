@@ -11,77 +11,87 @@
 
 void Solver_main()
 {
-    while(1){
+    int n1, n2;
+    do{
+        n1 = (sInit.b - sInit.a)/ sInit.h;
+        sInit.h /= 2;
+        n2 = (sInit.b - sInit.a)/ sInit.h;
 
-        if()
-    }
+        ShootingMethod(data.Y1, data.Y2, data.T, n1);
+        ShootingMethod(data.Y1_, data.Y2_, data.T_, n2);
+    }while(metric(data.Y1, data.Y1_, n1) < sInit.eps);
 }
 
 
-void ShootingMethod(int n)
+void ShootingMethod(double* y1, double* y2, double* T, int n)
 {
     double tr = 0; // Right point for shooting
     double tl;
     double t1 = sInit.a;
-    double loss;
 
-    data.Y1 = (double*) calloc(n, sizeof(double));
-    data.Y2 = (double*) calloc(n, sizeof(double));
-    data.T = (double*) calloc(n, sizeof(double));
+    if(y1 != NULL && y2 != NULL && T != NULL){
+        free(y1);
+        free(y2);
+        free(T);
+    }
 
-    data.Y1[0] = sInit.y_a;
-    data.Y2[0] = tr;
-    data.T[0] = t1;
+    y1 = (double*) malloc(n * sizeof(double));
+    y2 = (double*) malloc(n * sizeof(double));
+    T = (double*) malloc(n * sizeof(double));
 
-    GetStartingPoints(data.Y1, data.Y2, data.T);
-    Adams(data.Y1, data.Y2, data.T, n);
+    y1[0] = sInit.y_a;
+    y2[0] = tr;
+    T[0] = t1;
 
-    printf("%lf", f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]));
+    GetStartingPoints(y1, y2, T);
+    Adams(y1, y2, T, n);
+
+    printf("%lf", f2(T[n - 1], y1[n - 1], y2[n - 1]));
     tl = tr;
 
     do{
         tl -= .1;
 
-        free(data.T);
-        free(data.Y1);
-        free(data.Y2);
+        free(T);
+        free(y1);
+        free(y2);
 
-        data.Y1 = (double*) calloc(n, sizeof(double));
-        data.Y2 = (double*) calloc(n, sizeof(double));
-        data.T = (double*) calloc(n, sizeof(double));
+        y1 = (double*) malloc(n * sizeof(double));
+        y2 = (double*) malloc(n * sizeof(double));
+        T = (double*) malloc(n * sizeof(double));
 
-        data.Y1[0] = sInit.y_a;
-        data.Y2[0] = tl;
-        data.T[0] = tl;
+        y1[0] = sInit.y_a;
+        y2[0] = tl;
+        T[0] = tl;
 
-        GetStartingPoints(data.Y1, data.Y2, data.T);
-        Adams(data.Y1, data.Y2, data.T, n);
+        GetStartingPoints(y1, y2, T);
+        Adams(y1, y2, T, n);
 
-    }while (f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]) < 0);
+    }while (f2(T[n - 1], y1[n - 1], y2[n - 1]) < 0);
 
     double m;
 
     while(1){
         m = (tl + tr)/2;
 
-        free(data.T);
-        free(data.Y1);
-        free(data.Y2);
+        free(T);
+        free(y1);
+        free(y2);
 
-        data.Y1 = (double*) calloc(n, sizeof(double));
-        data.Y2 = (double*) calloc(n, sizeof(double));
-        data.T = (double*) calloc(n, sizeof(double));
+        y1 = (double*) malloc(n * sizeof(double));
+        y2 = (double*) malloc(n * sizeof(double));
+        T = (double*) malloc(n * sizeof(double));
 
-        data.Y1[0] = sInit.y_a;
-        data.Y2[0] = tl;
-        data.T[0] = tl;
+        y1[0] = sInit.y_a;
+        y2[0] = tl;
+        T[0] = tl;
 
-        GetStartingPoints(data.Y1, data.Y2, data.T);
-        Adams(data.Y1, data.Y2, data.T, n);
+        GetStartingPoints(y1, y2, T);
+        Adams(y1, y2, T, n);
 
-        if(fabs(f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1])) <= sInit.eps){
+        if(fabs(f2(T[n - 1], y1[n - 1], y2[n - 1])) <= sInit.eps){
             break;
-        }else if(f2(data.T[n - 1], data.Y1[n - 1], data.Y2[n - 1]) > 0){
+        }else if(f2(T[n - 1], y1[n - 1], y2[n - 1]) > 0){
             tr = m;
         }else{
             tl = m;
@@ -96,37 +106,37 @@ void GetStartingPoints(double* Y1, double* Y2, double* T)
     double k1, k2, k3, k4, l1, l2, l3, l4;
 
     for(int i = 0; i < 4; i++){
-        k1 = f1(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-        l1 = f2(data.T[i], data.Y1[i], data.Y2[i])*sInit.h;
-        k2 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-        l2 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k1/2, data.Y2[i] + l1/2)*sInit.h;
-        k3 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-        l3 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k2/2, data.Y2[i] + l2/2)*sInit.h;
-        k4 = f1(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
-        l4 = f2(data.T[i] + sInit.h/2, data.Y1[i] + k3/2, data.Y2[i] + l3/2)*sInit.h;
+        k1 = f1(T[i], Y1[i], Y2[i])*sInit.h;
+        l1 = f2(T[i], Y1[i], Y2[i])*sInit.h;
+        k2 = f1(T[i] + sInit.h/2, Y1[i] + k1/2, Y2[i] + l1/2)*sInit.h;
+        l2 = f2(T[i] + sInit.h/2, Y1[i] + k1/2, Y2[i] + l1/2)*sInit.h;
+        k3 = f1(T[i] + sInit.h/2, Y1[i] + k2/2, Y2[i] + l2/2)*sInit.h;
+        l3 = f2(T[i] + sInit.h/2, Y1[i] + k2/2, Y2[i] + l2/2)*sInit.h;
+        k4 = f1(T[i] + sInit.h/2, Y1[i] + k3/2, Y2[i] + l3/2)*sInit.h;
+        l4 = f2(T[i] + sInit.h/2, Y1[i] + k3/2, Y2[i] + l3/2)*sInit.h;
 
-        data.Y1[i + 1] = data.Y1[i] + (k1 + 2*k2 + 2*k3 + k4)/6;
-        data.Y2[i + 1] = data.Y2[i] + (l1 + 2*l2 + 2*l3 + l4)/6;
-        data.T[i + 1] = data.T[i] + sInit.h;
+        Y1[i + 1] = Y1[i] + (k1 + 2*k2 + 2*k3 + k4)/6;
+        Y2[i + 1] = Y2[i] + (l1 + 2*l2 + 2*l3 + l4)/6;
+        T[i + 1] = T[i] + sInit.h;
     }
 }
 
 void Adams(double* Y1, double* Y2, double* T, int n)
 {
     for(int i = 3; i < n - 1; i++){
-        data.Y1[i + 1] = data.Y1[i] + sInit.h*(
-                55*f1(data.T[i], data.Y1[i], data.Y2[i])
-                - 59*f1(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-                + 37*f1(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-                - 9*f1(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
+        Y1[i + 1] = Y1[i] + sInit.h*(
+                55*f1(T[i], Y1[i], Y2[i])
+                - 59*f1(T[i - 1], Y1[i - 1], Y2[i - 1])
+                + 37*f1(T[i - 2], Y1[i - 2], Y2[i - 2])
+                - 9*f1(T[i - 3], Y1[i - 3], Y2[i - 3]))/24;
 
-        data.Y2[i + 1] = data.Y2[i] + sInit.h*(
-                55*f2(data.T[i], data.Y1[i], data.Y2[i])
-                - 59*f2(data.T[i - 1], data.Y1[i - 1], data.Y2[i - 1])
-                + 37*f2(data.T[i - 2], data.Y1[i - 2], data.Y2[i - 2])
-                - 9*f2(data.T[i - 3], data.Y1[i - 3], data.Y2[i - 3]))/24;
+        Y2[i + 1] = Y2[i] + sInit.h*(
+                55*f2(T[i], Y1[i], Y2[i])
+                - 59*f2(T[i - 1], Y1[i - 1], Y2[i - 1])
+                + 37*f2(T[i - 2], Y1[i - 2], Y2[i - 2])
+                - 9*f2(T[i - 3], Y1[i - 3], Y2[i - 3]))/24;
 
-        data.T[i + 1] = data.T[i] + sInit.h;
+        T[i + 1] = T[i] + sInit.h;
     }
 }
 
@@ -143,8 +153,10 @@ double sum(double *array, int _size)
 
 double metric(double* y1, double* y2, int n)
 {
-    for(int i = 0; i < n; i++){
-        y1[i] -= y2[i];
-        y1[i] *= y1[i];
+    double* tmp = (double*)malloc(n * sizeof(double));
+    for(int i = 0, j = 0; i < n; i++, j += 2){
+        tmp[i] = y1[i] - y2[j];
+        tmp[i] *= tmp[i]/n;
     }
+    return sum(tmp, n);
 }

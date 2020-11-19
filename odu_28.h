@@ -14,7 +14,6 @@ typedef struct {
     double* Y1_;
     double* Y2_;
     double* T_;
-    int n;
 }SMainData;
 
 typedef struct SInitialData{
@@ -27,12 +26,12 @@ typedef struct SInitialData{
 }SInitialData;
 
 SInitialData sInit;
-static SMainData data;
+SMainData data;
 
 
 // Main solver functions
 void Solver_main();
-void ShootingMethod(int n);
+void ShootingMethod(double*, double*, double*, int n);
 void GetStartingPoints(double* Y1, double* Y2, double* T);
 void Adams(double* Y1, double* Y2, double* T, int n);
 double metric(double* y1, double* y2, int n);

@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 typedef enum {
     SUCCESS,
@@ -24,8 +25,15 @@ int main(int argv, char* argc[]) {
         }
     }
 
+    Solver_main();
 
+    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
+        printf("%lf ", data.Y1_[i]);
+    }
 
+    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
+        printf("%lf ", 3*data.T_[i] + exp(-2*data.T_[i]));
+    }
     return 0;
 }
 

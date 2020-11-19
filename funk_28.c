@@ -15,12 +15,12 @@ double f2(double x, double y1, double y2)
 
 static double p(double x)
 {
-    return 0;
+    return 4*x/(2*x + 1);
 }
 
 static double q(double x)
 {
-    return 0;
+    return -4*x/(2*x + 1);
 }
 
 static double f(double x)
