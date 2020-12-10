@@ -3,15 +3,13 @@
 #include <stdio.h>
 #include <math.h>
 
-char** error_messages = {
+const char error_messages[5][100] = {
     "Continue processing.\n",
     "Error code 1 (file doesn't exists).\n",
     "Error code 2 (file read error or not enough data in file).\n",
-    "Error code 3 (output error)"
-
+    "Error code 3 (output error).\n",
+    "Error code 4 (not enough arguments).\n"
 };
-
-#define ERROR_HANDLER(X) ((X) ? {printf(error_messages[(X)]); return (X)} : printf(error_messages[(X)]))
 
 typedef enum {
     SUCCESS,
@@ -20,22 +18,34 @@ typedef enum {
     OUTPUT_ERROR
 }ErrNo;
 
-ErrNo output(double*, int);
 ErrNo parseInput(char*);
+ErrNo output(double*, int);
 void draw(double*, double, double, double, int);
 
 int main(int argv, char* argc[]) {
-    if(argv > 1){
-        char* fileName = argc[1];
-        ERROR_HANDLER(parseInput(fileName));
+    if(argv > 1) {
+        char *fileName = argc[1];
+
+        int ret = parseInput(fileName);
+
+        if(ret) {
+            printf("%s", error_messages[ret]);
+            return ret;
+        }
+    }else{
+            printf("%s", error_messages[4]);
+            return 4;
+    }
 
     SMainData answer = Solver_main();
     draw(answer.Y1, sInit.a, sInit.b, sInit.h, (sInit.b - sInit.a) / sInit.h);
 
-   output(answer.Y1, (sInit.b - sInit.a) / sInit.h);
-     
+    int ret = output(answer.Y1, (sInit.b - sInit.a) / sInit.h);
 
-    
+    if(ret){
+        printf("%s", error_messages[ret]);
+        return ret;
+    }
     return 0;
 }
 
@@ -61,14 +71,14 @@ ErrNo output(double* y, int n)
     FILE* f = NULL;
     fopen_s(&f, "Data.out", "w");
     
-    int err = fprintf_s(f, "%d", n);
+    int err = fprintf_s(f, "%d\n", n);
 
     if(err < 0){
         return OUTPUT_ERROR;
     }
 
     for(int i = 0; i < n; i++){
-        int err = fprintf_s(f, "%lf", y[i]);
+        int err = fprintf_s(f, "%lf ", y[i]);
 
         if(err < 0){
             return OUTPUT_ERROR;
