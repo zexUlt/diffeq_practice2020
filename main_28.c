@@ -3,37 +3,39 @@
 #include <stdio.h>
 #include <math.h>
 
+char** error_messages = {
+    "Continue processing.\n",
+    "Error code 1 (file doesn't exists).\n",
+    "Error code 2 (file read error or not enough data in file).\n",
+    "Error code 3 (output error)"
+
+};
+
+#define ERROR_HANDLER(X) ((X) ? {printf(error_messages[(X)]); return (X)} : printf(error_messages[(X)]))
 
 typedef enum {
     SUCCESS,
     FILENEXST,
-    READ_ERROR
+    READ_ERROR,
+    OUTPUT_ERROR
 }ErrNo;
 
+ErrNo output(double*, int);
 ErrNo parseInput(char*);
 void draw(double*, double, double, double, int);
 
 int main(int argv, char* argc[]) {
     if(argv > 1){
         char* fileName = argc[1];
-        switch ((int) parseInput(fileName)) {
-            case FILENEXST: printf("Error code 1 (file doesn't exists).\n");
-                return 1;
-            case READ_ERROR: printf("Error code 2 (file read error or not enough data in file).\n");
-                return 2;
-            case SUCCESS: printf("Continue processing.\n");
-        }
-    }
+        ERROR_HANDLER(parseInput(fileName));
 
     SMainData answer = Solver_main();
     draw(answer.Y1, sInit.a, sInit.b, sInit.h, (sInit.b - sInit.a) / sInit.h);
-//    for(int i = 0; i < (sInit.b - sInit.a) / sInit.h; i++){
-//        printf("%lf ", answer.Y1[i]);
-//    }
-//    printf("\n");
-//    for(double i = sInit.a; i < sInit.b; i += sInit.h){
-//        printf("%lf ", 3*i + exp(-2*i));
-//    }
+
+   output(answer.Y1, (sInit.b - sInit.a) / sInit.h);
+     
+
+    
     return 0;
 }
 
@@ -53,6 +55,29 @@ ErrNo parseInput(char* _fName)
     }
     return SUCCESS;
 }
+
+ErrNo output(double* y, int n)
+{
+    FILE* f = NULL;
+    fopen_s(&f, "Data.out", "w");
+    
+    int err = fprintf_s(f, "%d", n);
+
+    if(err < 0){
+        return OUTPUT_ERROR;
+    }
+
+    for(int i = 0; i < n; i++){
+        int err = fprintf_s(f, "%lf", y[i]);
+
+        if(err < 0){
+            return OUTPUT_ERROR;
+        }
+    }
+
+    return SUCCESS;
+}
+
 
 void draw(double* y, double a, double b, double h, int n)
 {
