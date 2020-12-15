@@ -93,7 +93,7 @@ SMainData ShootingMethod(double* y1, double* y2, double* __T, int n, double h)
 
         y1[0] = sInit.y_a;
         y2[0] = isGPositive ? tl : tr;
-        __T[0] = tl;
+        __T[0] = t1;
 
         GetStartingPoints(y1, y2, __T, h);
         Adams(y1, y2, __T, n, h);
@@ -125,7 +125,7 @@ SMainData ShootingMethod(double* y1, double* y2, double* __T, int n, double h)
 
         y1[0] = sInit.y_a;
         y2[0] = m;
-        __T[0] = tl;
+        __T[0] = t1;
 
         GetStartingPoints(y1, y2, __T, h);
         Adams(y1, y2, __T, n, h);
